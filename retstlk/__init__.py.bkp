@@ -1,0 +1,83 @@
+# -*- coding: utf-8 -*-
+
+# ==================================== Meta ==================================== #
+'''
+Author: Ankit Murdia
+Version: 0.0.1
+Created: 2019-01-25 08:32:56
+Updated: 2019-01-25 10:25:02
+Description:
+Notes:
+To do:
+'''
+# ============================================================================== #
+
+
+# ================================ Dependencies ================================ #
+import os
+from flask import Flask
+# ============================================================================== #
+
+
+# ================================= Constants ================================== #
+
+# ============================================================================== #
+
+
+# ================================= Code Logic ================================= #
+#  Callable methods
+def create_app(test_config=None):
+	app = Flask(__name__, instance_relative_config=True)
+	app.config.from_mapping(
+		SECRET_KEY = 'dev',
+		DATABASE = {
+			'engine': 'sqlite',
+			'driver': '',
+			'user': '',
+			'pass': '',
+			'host': '',
+			'port': ''
+			'database': os.path.join(app.instance_path, 'retstlk.sqlite'),
+			'schema': os.path.abspath('./models/schema_sqlite.sql')
+		}
+	)
+	config_type = 'default'
+
+	if test_config is None:
+		app.config.from_pyfile('config.py', silent=True)
+		config_type = app.config.get('CONFIG_TYPE', config_type)
+	else:
+		app.config.from_mapping(test_config)
+		config_type = 'test'
+
+	try:
+		os.makedirs(app.instance_path)
+	except OSError:
+		pass
+
+	@app.route('/hello')
+	def hello():
+		return "Hello World!"
+
+	if config_type == 'default'
+		or (app.config.get('DATABASE', {}).get('engine') == 'sqlite'
+			and not app.config['USE_ORM']):
+		from helpers import sqlite_helper
+		sqlite_helper.init_app(app)
+		
+	elif app.config['USE_ORM']:
+		from helpers import orm_helper
+		orm_helper.init_app(app)
+
+
+	return app
+
+#  Abstracted classes
+
+# ============================================================================== #
+
+
+# ================================ CLI Handler ================================= #
+if __name__ == "__main__":
+	pass
+# ============================================================================== #
